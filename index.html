@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W05T4L1HFD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-W05T4L1HFD');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Biletowy MPK Łódź</title>
     <meta name="description" content="Dostępny kalkulator biletów MPK Łódź. Porównaj taryfę przystankową i czasową.">
+    
     <link rel="canonical" href="https://piotrrgw.github.io/MPK_bilet_Lodz/">
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     
     <style>
         :root {
@@ -17,10 +28,10 @@
             --success-bg: #f1f8e9;
             --success-border: #2e7d32;
             --bg-color: #f4f4f9;
-            --text-color: #222; /* Ciemniejszy dla lepszego kontrastu */
+            --text-color: #222;
             --white: #ffffff;
             --border-radius: 12px;
-            --focus-outline: 4px solid #0056b3; /* Bardzo wyraźny focus */
+            --focus-outline: 4px solid #0056b3;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -69,6 +80,21 @@
         h1 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Mała ikonka w nagłówku dla ozdoby (opcjonalnie) */
+        h1::before {
+            content: '';
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background-image: url('favicon.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
         }
 
         main {
@@ -96,7 +122,7 @@
             padding: 1.5rem;
             border-radius: var(--border-radius);
             box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-            border: 1px solid #ddd; /* Dodatkowa ramka dla trybu wysokiego kontrastu */
+            border: 1px solid #ddd;
         }
 
         .form-group {
@@ -107,24 +133,23 @@
             display: block;
             margin-bottom: 0.8rem;
             font-weight: 700;
-            font-size: 1.1rem; /* Większa czcionka etykiet */
+            font-size: 1.1rem;
             color: #000;
         }
 
         input[type="number"],
         select {
             width: 100%;
-            padding: 1rem; /* Większe pole dotykowe */
-            border: 2px solid #757575; /* Ciemniejsza ramka dla kontrastu */
+            padding: 1rem;
+            border: 2px solid #757575;
             border-radius: 8px;
             font-size: 1.2rem;
             background-color: #fff;
             color: #000;
         }
 
-        /* Bardzo wyraźny stan focus dla nawigacji klawiaturą */
         input:focus,
-        input[type="radio"]:focus + span, /* Focus na radio buttonach */
+        input[type="radio"]:focus + span,
         .radio-label input:focus {
             outline: var(--focus-outline);
             outline-offset: 2px;
@@ -142,7 +167,6 @@
             cursor: pointer;
         }
 
-        /* Ukryty natywny input, ale dostępny dla czytników */
         .radio-label input {
             opacity: 0;
             position: absolute;
@@ -151,7 +175,6 @@
             cursor: pointer;
         }
 
-        /* Stylizowany przycisk */
         .radio-btn-style {
             display: block;
             text-align: center;
@@ -170,7 +193,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
-        /* Focus widoczny na stylizowanym elemencie */
         .radio-label input:focus-visible + .radio-btn-style {
             outline: var(--focus-outline);
             outline-offset: 2px;
@@ -222,8 +244,8 @@
         }
 
         .winner .price-large {
-            color: #1b5e20; /* Jeszcze ciemniejszy zielony dla kontrastu AAA */
-            text-decoration: underline; /* Dodatkowe wyróżnienie bez koloru */
+            color: #1b5e20;
+            text-decoration: underline;
             text-decoration-thickness: 3px;
             text-decoration-color: var(--secondary-color);
         }
@@ -236,13 +258,13 @@
         .suggestion-box {
             margin-top: 1.2rem;
             background-color: var(--warning-bg);
-            color: #000; /* Czarny tekst dla kontrastu */
+            color: #000;
             padding: 1rem;
             border-radius: 8px;
             font-size: 0.95rem;
             text-align: left;
             border-left: 6px solid #ffc107;
-            border: 1px solid #e0a800; /* Pełna ramka */
+            border: 1px solid #e0a800;
             display: none;
         }
         
@@ -264,7 +286,6 @@
             margin-top: auto;
         }
 
-        /* High Contrast adjustments */
         @media (prefers-contrast: more) {
             :root {
                 --primary-color: #000000;
@@ -357,13 +378,13 @@
 
     <footer>
         <p>&copy; 2026 Współautorzy: Gemini, Piotr M 🚂</p>
-        <p>Wersja aplikacji: v1.2</p>
+        <p>Wersja aplikacji: v1.4</p>
     </footer>
 
     <script>
         /*
-         * Version: 1.2
-         * Accessibility improvements: ARIA, Focus management, Color independence.
+         * Version: 1.4
+         * Added Favicon logic (HTML link only, no JS changes required).
          */
 
         const inputs = document.querySelectorAll('input');
@@ -390,7 +411,6 @@
             stopResultCard.classList.remove('winner', 'active');
             timeResultCard.classList.remove('winner', 'active');
             
-            // Dostępność: Usuwamy aria-current z poprzednich wyników
             stopResultCard.removeAttribute('aria-current');
             timeResultCard.removeAttribute('aria-current');
 
@@ -470,7 +490,6 @@
 
         function markAsWinner(element) {
             element.classList.add('winner');
-            // Informacja dla czytników ekranowych, że to jest wybrana/najlepsza opcja
             element.setAttribute('aria-current', 'true'); 
         }
 
