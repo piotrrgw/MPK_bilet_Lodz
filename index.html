@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Biletowy MPK Łódź</title>
+    <meta name="description" content="Kalkulator biletów MPK Łódź. Porównaj taryfę przystankową i czasową z uwzględnieniem opóźnień.">
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            --secondary-color: #fbc02d;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        main {
+            flex: 1;
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media(min-width: 768px) {
+            main {
+                grid-template-columns: 1fr 1fr;
+                align-items: start;
+            }
+            .full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            background: #eee;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .radio-label {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.3s, color 0.3s;
+            font-weight: 600;
+        }
+
+        /* Ukrywamy domyślne radio buttony, stylujemy etykiety */
+        .radio-label input {
+            display: none;
+        }
+
+        .radio-label:has(input:checked) {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--white);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            opacity: 0.5; /* Domyślnie wyszarzone */
+            transition: all 0.3s;
+        }
+
+        .result-card.active {
+            opacity: 1;
+            border-color: #e0e0e0;
+        }
+
+        .result-card.winner {
+            border-color: #2e7d32;
+            background-color: #f1f8e9;
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(46, 125, 50, 0.15);
+        }
+
+        .price-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            line-height: 1;
+        }
+
+        .winner .price-large {
+            color: #2e7d32;
+        }
+
+        .details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .suggestion-box {
+            margin-top: 1rem;
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            text-align: left;
+            border-left: 4px solid #ffc107;
+            display: none; /* Ukryte domyślnie */
+        }
+
+        footer {
+            background-color: #333;
+            color: #ccc;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        /* Dostępność */
+        @media (prefers-reduced-motion: no-preference) {
+            .result-card {
+                transition: opacity 0.3s, transform 0.3s;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Kalkulator biletów MPK Łódź</h1>
+    </header>
+
+    <main>
+        <section class="card full-width">
+            <div class="form-group">
+                <label>Rodzaj biletu:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="ticketType" value="normal" checked>
+                        Normalny
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="ticketType" value="reduced">
+                        Ulgowy
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="form-group">
+                <label for="stops">Liczba przystanków:</label>
+                <input type="number" id="stops" min="0" max="100" placeholder="0">
+            </div>
+            <div id="stop-result" class="result-card">
+                <h3>Taryfa Przystankowa</h3>
+                <div class="price-large" id="stop-price">0.00 zł</div>
+                <p class="details">Opłata za dokładną trasę</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="form-group">
+                <label for="minutes">Planowany czas (minuty):</label>
+                <input type="number" id="minutes" min="0" max="1440" placeholder="0">
+            </div>
+            <div id="time-result" class="result-card">
+                <h3>Taryfa Czasowa</h3>
+                <div class="price-large" id="time-price">0.00 zł</div>
+                <p class="details" id="time-desc">Wybierz czas</p>
+                
+                <div id="time-suggestion" class="suggestion-box">
+                    <strong>⚠️ Ryzyko opóźnienia!</strong><br>
+                    Twój czas (<span id="sugg-input-time"></span> min) jest bliski limitu biletu.
+                    <br>Z uwagi na możliwe opóźnienia (+5 min), bezpieczniejszy może być <span id="sugg-ticket-name"></span> w cenie <strong><span id="sugg-price"></span> zł</strong>.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Współautorzy: Gemini, Piotr M 🚂</p>
+        <p>Wersja aplikacji: v1.1</p>
+    </footer>
+
+    <script>
+        /*
+         * Version: 1.1
+         * Feature: Automatic calculation & Safety Buffer Logic (5 min)
+         */
+
+        const inputs = document.querySelectorAll('input');
+        const stopResultCard = document.getElementById('stop-result');
+        const timeResultCard = document.getElementById('time-result');
+        const suggestionBox = document.getElementById('time-suggestion');
+
+        // Nasłuchujemy zmian na każdym polu input
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateAll);
+            input.addEventListener('change', calculateAll);
+        });
+
+        function calculateAll() {
+            const stops = parseInt(document.getElementById('stops').value) || 0;
+            const minutes = parseInt(document.getElementById('minutes').value) || 0;
+            const ticketType = document.querySelector('input[name="ticketType"]:checked').value;
+            const isReduced = ticketType === 'reduced';
+
+            // Reset UI
+            suggestionBox.style.display = 'none';
+            stopResultCard.classList.remove('winner', 'active');
+            timeResultCard.classList.remove('winner', 'active');
+
+            if (stops === 0 && minutes === 0) {
+                updatePriceDisplay('stop-price', 0);
+                updatePriceDisplay('time-price', 0);
+                document.getElementById('time-desc').textContent = "Wybierz czas";
+                return;
+            }
+
+            // --- 1. Obliczenia Przystankowe ---
+            let stopPrice = 0;
+            if (stops > 0) {
+                stopResultCard.classList.add('active');
+                
+                const sPrice1 = isReduced ? 0.50 : 1.00;
+                const sPriceNext = isReduced ? 0.25 : 0.50;
+                
+                stopPrice += sPrice1; // 1. przystanek
+                if (stops > 1) {
+                    const additional = Math.min(stops - 1, 18); // max 18 kolejnych płatnych
+                    stopPrice += additional * sPriceNext;
+                }
+            }
+            updatePriceDisplay('stop-price', stopPrice);
+
+            // --- 2. Obliczenia Czasowe ---
+            let timePrice = 0;
+            // Funkcja pomocnicza do pobierania ceny i nazwy biletu dla danej liczby minut
+            const getTicketInfo = (mins) => {
+                if (mins <= 20) return { price: (isReduced ? 2.20 : 4.40), name: "Bilet 20-min" };
+                if (mins <= 40) return { price: (isReduced ? 2.80 : 5.60), name: "Bilet 40-min" };
+                if (mins <= 80) return { price: (isReduced ? 3.40 : 6.80), name: "Bilet 80-min" };
+                return { price: (isReduced ? 9.00 : 18.00), name: "Bilet 24h" };
+            };
+
+            let currentTicket = { price: 0, name: "-" };
+            
+            if (minutes > 0) {
+                timeResultCard.classList.add('active');
+                
+                // Bilet dla wpisanego czasu (Strict)
+                currentTicket = getTicketInfo(minutes);
+                timePrice = currentTicket.price;
+                
+                document.getElementById('time-desc').textContent = currentTicket.name;
+
+                // --- 3. Logika Bufora 5 min ---
+                const bufferedMinutes = minutes + 5;
+                const safeTicket = getTicketInfo(bufferedMinutes);
+
+                // Jeśli bilet bezpieczny jest droższy niż ten wynikający z czystego czasu
+                // I jeśli w ogóle mieścimy się w jakimś rozsądnym limicie (np. nie sugerujemy 24h jak ktoś wpisał 5 dni)
+                if (safeTicket.price > currentTicket.price) {
+                    suggestionBox.style.display = 'block';
+                    document.getElementById('sugg-input-time').textContent = minutes;
+                    document.getElementById('sugg-ticket-name').textContent = safeTicket.name;
+                    document.getElementById('sugg-price').textContent = safeTicket.price.toFixed(2);
+                }
+            }
+            updatePriceDisplay('time-price', timePrice);
+
+            // --- 4. Porównanie i wyłonienie zwycięzcy ---
+            // Porównujemy tylko jeśli obie wartości są > 0, lub jeśli jedna jest 0 to wygrywa ta druga (o ile >0)
+            
+            if (stops > 0 && minutes > 0) {
+                if (stopPrice < timePrice) {
+                    stopResultCard.classList.add('winner');
+                } else if (timePrice < stopPrice) {
+                    timeResultCard.classList.add('winner');
+                } else {
+                    // Remis - oba są zwycięzcami
+                    stopResultCard.classList.add('winner');
+                    timeResultCard.classList.add('winner');
+                }
+            } else if (stops > 0) {
+                stopResultCard.classList.add('winner');
+            } else if (minutes > 0) {
+                timeResultCard.classList.add('winner');
+            }
+        }
+
+        function updatePriceDisplay(elementId, price) {
+            document.getElementById(elementId).textContent = price.toFixed(2) + " zł";
+        }
+    </script>
+</body>
+</html>
